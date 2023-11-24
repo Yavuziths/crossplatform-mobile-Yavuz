@@ -40,7 +40,7 @@ const firebaseBaseQuery = async ({ baseUrl, url, method, body }) => {
   }
 };
 
-export const usersApi = createApi({
+export const postsApi = createApi({
   reducerPath: "usersApi",
   baseQuery: firebaseBaseQuery,
   tagTypes: ["users"],
@@ -94,4 +94,4 @@ export const {
   useGetUsersQuery,
   useDeleteUserMutation,
   useUpdateUserMutation,
-} = usersApi;
+} = postsApi;

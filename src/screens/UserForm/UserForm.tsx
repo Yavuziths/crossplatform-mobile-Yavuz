@@ -10,25 +10,28 @@ import {
 } from "react-native";
 import { useToast } from "react-native-toast-notifications";
 
-import { useCreateUserMutation } from "../../store/api/usersApi";
+import {
+  useCreateUserMutation,
+  useUpdateUserMutation,
+} from "../../store/api/usersApi";
 
-export const UserForm = (props) => {
-  const { navigation } = props;
+export const UserForm = ({ navigation, route }) => {
   const lastNameRef = useRef(null);
 
   const { t } = useTranslation();
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [createUser, { isLoading }] = useCreateUserMutation();
+  // Check if we're editing an existing user or creating a new one
+  const isEdit = route.params?.user != null;
+  const [firstName, setFirstName] = useState(
+    route?.params?.user?.firstName || "",
+  );
+  const [lastName, setLastName] = useState(route?.params?.user?.lastName || "");
+  const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
+  const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
   const toast = useToast();
 
   const handleSubmit = () => {
-    console.log("firstName: ", firstName);
-    console.log("lastName: ", lastName);
-
     if (firstName === "" || lastName === "") {
-      // show toast, must fill all inputs
       console.log("Invalid form!");
       toast.show("Please fill out all inputs", {
         type: "warning",
@@ -39,56 +42,69 @@ export const UserForm = (props) => {
       return;
     }
 
-    createUser({
-      user: {
-        firstName,
-        lastName,
-      },
-    })
-      .then(() => {
-        navigation.navigate("UserList");
-        toast.show(`Användaren ${firstName} ${lastName} har skapats!`, {
-          type: "success",
-          placement: "top",
-          duration: 4000,
-          animationType: "slide-in",
+    if (isEdit) {
+      updateUser({ user: { id: route.params.user.id, firstName, lastName } })
+        .then(() => {
+          navigation.goBack();
+          toast.show(`User ${firstName} ${lastName} updated!`, {
+            type: "success",
+            placement: "top",
+            duration: 4000,
+            animationType: "slide-in",
+          });
+        })
+        .catch((error) => {
+          toast.show(error.message || "An error occurred", { type: "danger" });
         });
-        setFirstName("");
-        setLastName("");
-      })
-      .catch((error) => {
-        toast.show(error, { type: "danger" });
-      });
+    } else {
+      createUser({ user: { firstName, lastName } })
+        .then(() => {
+          navigation.navigate("UserList");
+          toast.show(`User ${firstName} ${lastName} created!`, {
+            type: "success",
+            placement: "top",
+            duration: 4000,
+            animationType: "slide-in",
+          });
+          setFirstName("");
+          setLastName("");
+        })
+        .catch((error) => {
+          toast.show(error.message || "An error occurred", { type: "danger" });
+        });
+    }
   };
+
+  const isLoading = isCreating || isUpdating;
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.parentContainer}>
         <View style={styles.container}>
-          <Text>Create your user</Text>
+          <Text>{isEdit ? "Edit your user" : "Create your user"}</Text>
           <Input
             returnKeyType="next"
             onSubmitEditing={() => lastNameRef.current.focus()}
             blurOnSubmit={false}
             value={firstName}
             disabled={isLoading}
-            onChangeText={(text) => setFirstName(text)}
-            placeholder="First name"
+            onChangeText={setFirstName}
+            placeholder={t("Förnamn")}
           />
           <Input
             ref={lastNameRef}
             value={lastName}
             disabled={isLoading}
             returnKeyType="send"
-            onSubmitEditing={() => handleSubmit()}
-            onChangeText={(text) => setLastName(text)}
-            placeholder="Last name"
+            onSubmitEditing={handleSubmit}
+            onChangeText={setLastName}
+            placeholder={t("Efternamn")}
           />
           <Button
-            title={t("createUser")}
+            title={isEdit ? t("updateUser") : t("createUser")}
             disabled={isLoading}
             loading={isLoading}
-            onPress={() => handleSubmit()}
+            onPress={handleSubmit}
           />
         </View>
       </View>
@@ -100,9 +116,6 @@ const styles = StyleSheet.create({
   parentContainer: {
     flex: 1,
     backgroundColor: "white",
-    // margin: 36,
-    // marginTop: 84,
-    // border: 1px solid black
     borderColor: "#eee",
     borderWidth: 1,
     borderRadius: 16,
