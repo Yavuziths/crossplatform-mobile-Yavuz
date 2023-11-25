@@ -1,12 +1,15 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import React from "react";
 import { I18nextProvider } from "react-i18next";
 import { ToastProvider } from "react-native-toast-notifications";
 import { Provider, useSelector } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 
 import i18n from "./i18n";
+import { PostForm } from "./src/screens/PostForm";
+import { PostList } from "./src/screens/PostList";
 import { Settings } from "./src/screens/Settings/Settings";
 import { UserForm } from "./src/screens/UserForm/UserForm";
 import { UserInfo } from "./src/screens/UserInfo/UserInfo";
@@ -20,6 +23,10 @@ const UserListStackScreen = () => {
     <UserListStack.Navigator>
       <UserListStack.Screen name="UserList" component={UserList} />
       <UserListStack.Screen name="UserInfo" component={UserInfo} />
+      <UserListStack.Screen name="UserForm" component={UserForm} />
+      {/* Add the PostForm and PostList to the stack navigator */}
+      <UserListStack.Screen name="PostForm" component={PostForm} />
+      <UserListStack.Screen name="PostList" component={PostList} />
     </UserListStack.Navigator>
   );
 };
@@ -27,7 +34,7 @@ const UserListStackScreen = () => {
 const Tab = createBottomTabNavigator();
 
 const NavigationWrapper = () => {
-  const loggedInAs = useSelector((state: any) => state.auth.loggedInAs);
+  const loggedInAs = useSelector((state) => state.auth.loggedInAs);
 
   return (
     <NavigationContainer>
@@ -37,17 +44,17 @@ const NavigationWrapper = () => {
           component={UserListStackScreen}
           options={{ headerShown: false }}
         />
-        <Tab.Screen name="UserForm" component={UserForm} />
+        {/* No need for UserForm here since it's included in the stack above */}
         {loggedInAs && (
           <Tab.Screen
-            name="UserInfo"
-            component={UserInfo}
+            name="Settings"
+            component={Settings}
             options={{
               title: `${loggedInAs.firstName} ${loggedInAs.lastName}`,
             }}
           />
         )}
-        <Tab.Screen name="Settings" component={Settings} />
+        {/* If other specific tabs are needed for posts, add them here */}
       </Tab.Navigator>
     </NavigationContainer>
   );
