@@ -1,6 +1,7 @@
-import React from 'react';
-import { View, FlatList, Text, StyleSheet } from 'react-native';
-import { useGetPostsQuery } from '../../store/api/postsApi';
+import React from "react";
+import { View, FlatList, Text, StyleSheet } from "react-native";
+
+import { useGetPostsQuery } from "../../store/api/postsApi";
 
 const PostList = () => {
   const { data: posts, isLoading, isError } = useGetPostsQuery();
@@ -31,7 +32,7 @@ const styles = StyleSheet.create({
   postContainer: {
     padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: "#ccc",
   },
   postText: {
     fontSize: 16,

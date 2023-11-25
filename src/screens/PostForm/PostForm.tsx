@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { View, TextInput, Button, StyleSheet } from "react-native";
 import { useSelector } from "react-redux";
@@ -9,6 +10,8 @@ const PostForm = () => {
   const loggedInUserId = useSelector((state) => state.auth.loggedInAs?.id);
   const [createPost, { isLoading }] = useCreatePostMutation();
 
+  const navigation = useNavigation();
+
   const handleCreatePost = async () => {
     if (!postText.trim()) {
       alert("Please enter some text for the post");
@@ -16,13 +19,13 @@ const PostForm = () => {
     }
 
     try {
-      await createPost({
+      const result = await createPost({
         text: postText,
         createdBy: loggedInUserId,
         createdDate: new Date().toISOString(),
       }).unwrap();
+      navigation.navigate("PostList");
       setPostText("");
-      // Add navigation or other success handling here
     } catch (error) {
       // Handle any errors in post creation here
       alert("Error creating post");

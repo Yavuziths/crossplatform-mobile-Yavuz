@@ -8,8 +8,8 @@ import { Provider, useSelector } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 
 import i18n from "./i18n";
-import { PostForm } from "./src/screens/PostForm";
-import { PostList } from "./src/screens/PostList";
+import PostForm from "./src/screens/PostForm";
+import PostList from "./src/screens/PostList";
 import { Settings } from "./src/screens/Settings/Settings";
 import { UserForm } from "./src/screens/UserForm/UserForm";
 import { UserInfo } from "./src/screens/UserInfo/UserInfo";
@@ -17,6 +17,7 @@ import UserList from "./src/screens/UserList/UserList";
 import { persistor, store } from "./src/store/store";
 
 const UserListStack = createNativeStackNavigator();
+const PostStack = createNativeStackNavigator();
 
 const UserListStackScreen = () => {
   return (
@@ -24,10 +25,24 @@ const UserListStackScreen = () => {
       <UserListStack.Screen name="UserList" component={UserList} />
       <UserListStack.Screen name="UserInfo" component={UserInfo} />
       <UserListStack.Screen name="UserForm" component={UserForm} />
-      {/* Add the PostForm and PostList to the stack navigator */}
-      <UserListStack.Screen name="PostForm" component={PostForm} />
-      <UserListStack.Screen name="PostList" component={PostList} />
     </UserListStack.Navigator>
+  );
+};
+
+const PostStackScreen = () => {
+  return (
+    <PostStack.Navigator>
+      <PostStack.Screen
+        name="PostList"
+        component={PostList}
+        options={{ title: "Posts" }}
+      />
+      <PostStack.Screen
+        name="PostForm"
+        component={PostForm}
+        options={{ title: "Create Post" }}
+      />
+    </PostStack.Navigator>
   );
 };
 
@@ -44,7 +59,11 @@ const NavigationWrapper = () => {
           component={UserListStackScreen}
           options={{ headerShown: false }}
         />
-        {/* No need for UserForm here since it's included in the stack above */}
+        <Tab.Screen
+          name="PostStack"
+          component={PostStackScreen}
+          options={{ headerShown: false, tabBarLabel: "Posts" }}
+        />
         {loggedInAs && (
           <Tab.Screen
             name="Settings"
@@ -54,7 +73,6 @@ const NavigationWrapper = () => {
             }}
           />
         )}
-        {/* If other specific tabs are needed for posts, add them here */}
       </Tab.Navigator>
     </NavigationContainer>
   );
