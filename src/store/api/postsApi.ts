@@ -45,9 +45,8 @@ export const postsApi = createApi({
   baseQuery: firebaseBaseQuery,
   tagTypes: ["Post"],
   endpoints: (builder) => ({
-    // For creating a new post
     createPost: builder.mutation({
-      query: ({ post }) => ({
+      query: (post) => ({
         baseUrl: "",
         url: "posts",
         method: "POST",
@@ -55,7 +54,7 @@ export const postsApi = createApi({
       }),
       invalidatesTags: ["Post"],
     }),
-    // For getting all existing posts
+
     getPosts: builder.query({
       query: () => ({
         baseUrl: "",
@@ -65,7 +64,6 @@ export const postsApi = createApi({
       }),
       providesTags: ["Post"],
     }),
-    // For deleting a post based on id
     deletePost: builder.mutation({
       query: (id) => ({
         baseUrl: "",
@@ -75,7 +73,6 @@ export const postsApi = createApi({
       }),
       invalidatesTags: ["Post"],
     }),
-    // For updating a post
     updatePost: builder.mutation({
       query: ({ post }) => ({
         baseUrl: "",
@@ -87,8 +84,6 @@ export const postsApi = createApi({
     }),
   }),
 });
-
-// Export the generated Queries and Mutations here
 export const {
   useCreatePostMutation,
   useGetPostsQuery,

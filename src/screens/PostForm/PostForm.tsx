@@ -18,16 +18,17 @@ const PostForm = () => {
       return;
     }
 
+    const newPost = {
+      text: postText,
+      createdBy: loggedInUserId,
+      createdDate: new Date().toISOString(),
+    };
+
     try {
-      const result = await createPost({
-        text: postText,
-        createdBy: loggedInUserId,
-        createdDate: new Date().toISOString(),
-      }).unwrap();
-      navigation.navigate("PostList");
+      await createPost(newPost).unwrap();
+      navigation.navigate("Posts");
       setPostText("");
     } catch (error) {
-      // Handle any errors in post creation here
       alert("Error creating post");
     }
   };
@@ -38,7 +39,7 @@ const PostForm = () => {
         style={styles.input}
         value={postText}
         onChangeText={setPostText}
-        placeholder="What's happening?"
+        placeholder="Berätta mer?"
         multiline
       />
       <Button
@@ -50,6 +51,7 @@ const PostForm = () => {
   );
 };
 
+// Styles for the PostForm component
 const styles = StyleSheet.create({
   container: {
     flex: 1,

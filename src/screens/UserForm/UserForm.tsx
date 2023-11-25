@@ -8,19 +8,16 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
+
 import { useToast } from "react-native-toast-notifications";
 
 import {
   useCreateUserMutation,
   useUpdateUserMutation,
 } from "../../store/api/usersApi";
-
 export const UserForm = ({ navigation, route }) => {
   const lastNameRef = useRef(null);
-
   const { t } = useTranslation();
-
-  // Check if we're editing an existing user or creating a new one
   const isEdit = route.params?.user != null;
   const [firstName, setFirstName] = useState(
     route?.params?.user?.firstName || "",
@@ -41,7 +38,6 @@ export const UserForm = ({ navigation, route }) => {
       });
       return;
     }
-
     if (isEdit) {
       updateUser({ user: { id: route.params.user.id, firstName, lastName } })
         .then(() => {
@@ -81,7 +77,7 @@ export const UserForm = ({ navigation, route }) => {
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.parentContainer}>
         <View style={styles.container}>
-          <Text>{isEdit ? "Edit your user" : "Create your user"}</Text>
+          <Text>{isEdit ? "Ändra användare" : "Skapa Användare"}</Text>
           <Input
             returnKeyType="next"
             onSubmitEditing={() => lastNameRef.current.focus()}

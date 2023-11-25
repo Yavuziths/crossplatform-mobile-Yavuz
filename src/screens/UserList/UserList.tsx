@@ -17,7 +17,7 @@ import {
 } from "../../store/api/usersApi";
 
 const UserList = ({ navigation }) => {
-  const { data, isLoading, refetch } = useGetUsersQuery({});
+  const { data: users, isLoading, refetch } = useGetUsersQuery({});
   const [deleteUser] = useDeleteUserMutation();
   const [deleteUserId, setDeleteUserId] = useState(null);
   const [isConfirmationModalVisible, setConfirmationModalVisible] =
@@ -58,13 +58,26 @@ const UserList = ({ navigation }) => {
     }
   };
 
+  // Sort users alphabetically by firstName and then by lastName
+  const sortedUsers = users?.slice().sort((a, b) => {
+    const nameA = `${a.firstName} ${a.lastName}`.toUpperCase(); // ignore upper and lowercase
+    const nameB = `${b.firstName} ${b.lastName}`.toUpperCase(); // ignore upper and lowercase
+    if (nameA < nameB) {
+      return -1;
+    }
+    if (nameA > nameB) {
+      return 1;
+    }
+    return 0; // names must be equal
+  });
+
   return (
-    <View>
+    <View style={styles.container}>
       {isLoading ? (
         <Text>Loading...</Text>
       ) : (
         <FlatList
-          data={data}
+          data={sortedUsers}
           refreshControl={
             <RefreshControl refreshing={isLoading} onRefresh={refetch} />
           }
@@ -134,6 +147,10 @@ const UserList = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 10,
+  },
   userItem: {
     flexDirection: "row",
     justifyContent: "space-between",

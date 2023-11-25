@@ -14,10 +14,9 @@ const rootReducer = combineReducers({
   [usersApi.reducerPath]: usersApi.reducer,
   auth: authSlice,
   config: configSlice,
-  // other reducers would go here
+
 });
 
-// Define the RootState type based on the rootReducer
 export type RootState = ReturnType<typeof rootReducer>;
 
 const middlewares = [usersApi.middleware, postsApi.middleware];
@@ -30,7 +29,7 @@ if (process.env.NODE_ENV === "development") {
 const persistConfig = {
   key: "crossplatform-mobile-v1.0.0",
   storage: AsyncStorage,
-  whitelist: ["auth", "config"],
+  whitelist: ["auth", "config", postsApi.reducerPath],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -50,8 +49,8 @@ export const store = configureStore({
 });
 
 export const persistor = persistStore(store, null, () => {
-  // Initialize anything you need after rehydration is complete
   const state = store.getState();
+  console.log("Rehydrated state:", state);
   initializeI18n(state.config.locale);
 });
 

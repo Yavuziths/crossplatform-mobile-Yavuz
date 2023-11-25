@@ -2,23 +2,38 @@ import React from "react";
 import { View, FlatList, Text, StyleSheet } from "react-native";
 
 import { useGetPostsQuery } from "../../store/api/postsApi";
+import { useGetUsersQuery } from "../../store/api/usersApi";
 
 const PostList = () => {
-  const { data: posts, isLoading, isError } = useGetPostsQuery();
+  const { data: posts } = useGetPostsQuery({});
+  const { data: users } = useGetUsersQuery({});
 
-  if (isLoading) return <Text>Loading...</Text>;
-  if (isError) return <Text>Error occurred while fetching posts.</Text>;
+  const sortedPosts = posts?.slice().sort((a, b) => {
+    return new Date(b.createdDate) - new Date(a.createdDate);
+  });
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={posts}
+        data={sortedPosts}
         keyExtractor={(post) => post.id}
-        renderItem={({ item }) => (
-          <View style={styles.postContainer}>
-            <Text style={styles.postText}>{item.text}</Text>
-          </View>
-        )}
+        renderItem={({ item }) => {
+
+          const user = users?.find((u) => u.id === item.createdBy);
+
+          return (
+            <View style={styles.postContainer}>
+              <Text style={styles.postText}>
+                {user
+                  ? `${user.firstName} ${user.lastName}: `
+                  : "Unknown user: "}
+                {item.text}
+              </Text>
+              <Text style={styles.postDate}>{item.createdDate}</Text>
+            </View>
+          );
+        }}
+        inverted
       />
     </View>
   );
@@ -36,6 +51,10 @@ const styles = StyleSheet.create({
   },
   postText: {
     fontSize: 16,
+  },
+  postDate: {
+    color: "#666",
+    fontSize: 12,
   },
 });
 

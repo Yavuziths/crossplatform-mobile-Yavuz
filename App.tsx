@@ -24,7 +24,6 @@ const UserListStackScreen = () => {
     <UserListStack.Navigator>
       <UserListStack.Screen name="UserList" component={UserList} />
       <UserListStack.Screen name="UserInfo" component={UserInfo} />
-      <UserListStack.Screen name="UserForm" component={UserForm} />
     </UserListStack.Navigator>
   );
 };
@@ -55,14 +54,26 @@ const NavigationWrapper = () => {
     <NavigationContainer>
       <Tab.Navigator>
         <Tab.Screen
-          name="UserListStack"
+          name="User List"
           component={UserListStackScreen}
           options={{ headerShown: false }}
         />
+        {/* Only include this if you want UserForm to be directly accessible from the tab bar */}
         <Tab.Screen
-          name="PostStack"
+          name="UserForm"
+          component={UserForm}
+          options={{ title: "User Form" }}
+        />
+        <Tab.Screen
+          name="Posts"
           component={PostStackScreen}
-          options={{ headerShown: false, tabBarLabel: "Posts" }}
+          options={{ headerShown: false }}
+        />
+        {/* Add a separate tab for PostForm if needed */}
+        <Tab.Screen
+          name="Create Post"
+          component={PostForm}
+          options={{ title: "Create Post" }}
         />
         {loggedInAs && (
           <Tab.Screen

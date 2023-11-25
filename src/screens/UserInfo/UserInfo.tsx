@@ -25,7 +25,13 @@ export const UserInfo = ({ route, navigation }) => {
           </>
         ) : (
           <>
-            <Button onPress={() => dispatch(logIn(user))} title="Logga in" />
+            <Button
+              onPress={() => {
+                console.log("Logging in user:", user);
+                dispatch(logIn(user));
+              }}
+              title="Logga in"
+            />
           </>
         )}
       </View>
