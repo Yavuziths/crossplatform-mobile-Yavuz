@@ -1,41 +1,97 @@
-// src/store/api/postsApi.ts
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import {
+  addDoc,
+  doc,
+  collection,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+} from "firebase/firestore";
 
 import { db } from "../../../firebase-config";
-// Import relevant methods from Firebase
+
+const firebaseBaseQuery = async ({ baseUrl, url, method, body }) => {
+  switch (method) {
+    case "GET": {
+      const snapshot = await getDocs(collection(db, url));
+      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      return { data };
+    }
+
+    case "POST": {
+      const docRef = await addDoc(collection(db, url), body);
+      return { data: { id: docRef.id, ...body } };
+    }
+
+    case "DELETE": {
+      const docRef = doc(db, url, body);
+      await deleteDoc(docRef);
+      return { data: { id: body } };
+    }
+
+    case "PUT": {
+      const docRef = doc(db, url, body.id);
+      await updateDoc(docRef, body);
+      return { data: body };
+    }
+
+    default:
+      throw new Error(`Unhandled method ${method}`);
+  }
+};
 
 export const postsApi = createApi({
   reducerPath: "postsApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "/" }),
+  baseQuery: firebaseBaseQuery,
   tagTypes: ["Post"],
   endpoints: (builder) => ({
-    getPosts: builder.query({
-      query: () => "posts",
-      transformResponse: (response) => {
-        // Transform the response to the format your app expects
-        return response;
-      },
-    }),
+    // For creating a new post
     createPost: builder.mutation({
-      query: (newPost) => ({
+      query: ({ post }) => ({
+        baseUrl: "",
         url: "posts",
         method: "POST",
-        body: newPost,
+        body: post,
       }),
+      invalidatesTags: ["Post"],
     }),
+    // For getting all existing posts
+    getPosts: builder.query({
+      query: () => ({
+        baseUrl: "",
+        url: "posts",
+        method: "GET",
+        body: "",
+      }),
+      providesTags: ["Post"],
+    }),
+    // For deleting a post based on id
     deletePost: builder.mutation({
-      query: (postId) => ({
-        url: `posts/${postId}`,
+      query: (id) => ({
+        baseUrl: "",
+        url: "posts",
         method: "DELETE",
+        body: id,
       }),
+      invalidatesTags: ["Post"],
     }),
-    // Add other endpoints as needed
+    // For updating a post
+    updatePost: builder.mutation({
+      query: ({ post }) => ({
+        baseUrl: "",
+        url: "posts",
+        method: "PUT",
+        body: post,
+      }),
+      invalidatesTags: ["Post"],
+    }),
   }),
 });
 
+// Export the generated Queries and Mutations here
 export const {
-  useGetPostsQuery,
   useCreatePostMutation,
+  useGetPostsQuery,
   useDeletePostMutation,
-  // Add other hooks as necessary
+  useUpdatePostMutation,
 } = postsApi;

@@ -8,13 +8,13 @@ import { Provider, useSelector } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 
 import i18n from "./i18n";
-import PostForm from "./src/screens/PostForm";
-import PostList from "./src/screens/PostList";
+import PostForm from "./src/screens/PostForm/PostForm";
+import PostList from "./src/screens/PostList/PostList";
 import { Settings } from "./src/screens/Settings/Settings";
 import { UserForm } from "./src/screens/UserForm/UserForm";
 import { UserInfo } from "./src/screens/UserInfo/UserInfo";
 import UserList from "./src/screens/UserList/UserList";
-import { persistor, store } from "./src/store/store";
+import { persistor, store, RootState } from "./src/store/store";
 
 const UserListStack = createNativeStackNavigator();
 const PostStack = createNativeStackNavigator();
@@ -49,7 +49,7 @@ const PostStackScreen = () => {
 const Tab = createBottomTabNavigator();
 
 const NavigationWrapper = () => {
-  const loggedInAs = useSelector((state) => state.auth.loggedInAs);
+  const loggedInAs = useSelector((state: RootState) => state.auth.loggedInAs);
 
   return (
     <NavigationContainer>
